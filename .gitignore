@@ -1,0 +1,87 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+.yarn-integrity
+
+# Gulp generated files
+dist/
+build/
+
+# Python specific ignores
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.env/
+*.pyc
+*.pyo
+*.pyd
+.Python
+python.env
+pip-log.txt
+pip-delete-this-directory.txt
+
+# VS Code specific ignores
+.vscode/
+
+# MacOS specific ignores
+.DS_Store
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Virtual environment
+venv/
+ENV/
+
+# Static files
+staticfiles/
+
+# Media files
+media/
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Other files
+.idea/
