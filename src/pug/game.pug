@@ -1,0 +1,33 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title My Portfolio
+    link(rel="stylesheet", href=`/static/css/style.css`)
+  body
+    header
+      h1 Welcome to My Portfolio
+      nav
+        ul
+          li: a(href="index.html") About Me
+          li: a(href="index.html#projects") Projects
+          li: a(href="/game.html") DARTs!
+          li: a(href="index.html#contact") Contact
+
+    main
+      block content
+        h2 Game Page
+
+        if message
+          p #{message}
+
+        form(method="POST", enctype="multipart/form-data")
+          input(type="text", name="user_input", placeholder="Enter your input")
+          br
+          input(type="file", name="file")
+          br
+          button(type="submit") Submit
+
+    footer
+      p &copy; 2024 My Portfolio

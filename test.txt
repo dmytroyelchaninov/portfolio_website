@@ -1,0 +1,5 @@
+  // "scripts": {
+  //   "start": "concurrently \"npm run gulp\" \"npm run flask\"",
+  //   "gulp": "gulp",
+  //   "flask": "python darts_app/app.py"
+  // },
