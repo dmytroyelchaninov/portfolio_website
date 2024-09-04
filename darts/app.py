@@ -1,15 +1,59 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify, url_for, redirect
+import os
+import random
+import sys
 
-# Initialize the Flask application
-app = Flask(__name__, 
-            template_folder='templates',   # Specifies the directory for templates
-            static_folder='../static')     # Specifies the directory for static files
+script_dir = os.path.dirname(os.path.abspath(__file__))
+yolos_dir = os.path.join(script_dir, 'yolos')
+sys.path.append(yolos_dir)
 
-@app.route('/game')
+from game.image_transform import process_image, test_run
+
+app = Flask(__name__,
+            template_folder='templates',
+            static_folder='../static')
+
+UPLOAD_FOLDER = 'static/uploads/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/game', methods=['GET', 'POST'])
 def game():
-    # Render the game.html template when the /game route is accessed
-    return render_template('game.html')
+    messages = [
+        "Welcome to the game!",
+        "Try your luck today!",
+        "Good luck, player!",
+        "May the odds be ever in your favor!",
+        "Ready to play?"
+    ]
+    message = random.choice(messages)
+
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        if 'file' not in request.files:
+            return jsonify({'message': 'No file'}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'message': 'No selected file'}), 400
+        if file:
+            filename = file.filename
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            # Process the image using the process_image function
+            processed_image_path, score_list = process_image(filepath)
+            score = ', '.join(map(str, score_list))
+
+            # Construct the URL for the processed image
+            processed_image_url = url_for('static', filename=f'uploads/{os.path.basename(processed_image_path)}')
+
+            # Return a JSON response with the image URL, message, and score
+            return jsonify({
+                'image_url': processed_image_url,
+                'message': message,
+                'score': score
+            })
+    
+    return render_template('game.html', message=message)
 
 if __name__ == '__main__':
-    # Run the Flask application in debug mode on port 5000
     app.run(debug=True, port=5000)

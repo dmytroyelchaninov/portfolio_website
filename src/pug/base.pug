@@ -1,22 +1,44 @@
 doctype html
 html(lang="en")
+  block main_vars
+  
   head
     meta(charset="UTF-8")
-    meta(name="viewport" content="width=device-width, initial-scale=1.0")
-    title My Portfolio
-    link(rel="stylesheet", href=`/css/style.css`)
+    meta(name="viewport" content="width=device-width")
+    title= "Data science and me"
+    each css in css_main || []
+      link(rel="stylesheet", href=css)
+
   body
-    header
-      h1 Welcome to My Portfolio
-      nav
-        ul
-          li: a(href="index.html") About Me
-          li: a(href="index.html#projects") Projects
-          li: a(href="/game.html") DARTs!
-          li: a(href="index.html#contact") Contact
+    .wrapper
+      header.header
+        .container
+          .header__body
+            a.header__logo(href="about.html")
+              img#logo(src="", alt="Logo")
+            .header__burger
+              span
+              span
+              span
+              
+            nav.header__menu
+              ul.header__list
+                li: a.header__link(href="about.html") About Me
+                li: a.header__link(href="") Projects
+                li: a.header__link(href="game.html") DARTs!
+                li: a.header__link(href="photo.html") Photography
+                li: a.header__link(href="people.html") Who Am I Proud Of
+                li: a.header__link(href="contact.html") Contact
+      .content
+        .container
+          main 
+            block content
 
-    main
-      block content
+    each js in js_main || []
+      script(src=js)
 
-    footer
-      p &copy; 2024 My Portfolio
+    footer.footer
+      .footer__body
+        .footer__text
+          p &copy; 2024 Yelchaninov
+          p Interesting

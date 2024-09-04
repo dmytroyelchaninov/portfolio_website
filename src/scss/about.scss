@@ -1,0 +1,25 @@
+$background-color: #000;
+$hover-color: #909090;
+
+$color-main: #f4f4f4;
+$font-stack: 'Didot', sans-serif;
+$font-size-base: 16px;
+$font-size-25: 2.5rem;
+$font-size-20: 2rem;
+$font-size-175: 1.75rem;
+$font-size-15: 1.5rem;
+$font-size-125: 1.25rem;
+$font-size-10: 1rem;
+$font-size-075: 0.75rem;
+
+.content__text {
+    font-size: $font-size-25;
+    line-height: 40px;
+}
+
+@media screen and (max-width: 768px) {
+    .content__text {
+        font-size: $font-size-10;
+        line-height: 25px;
+    } 
+}

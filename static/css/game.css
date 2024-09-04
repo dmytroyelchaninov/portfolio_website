@@ -1,0 +1,108 @@
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 120px); /* Adjust height based on header and footer */
+  padding: 20px;
+  position: relative; /* Position arrows relative to the container */
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.image-wrapper.drag-over {
+  background-color: rgba(0, 0, 0, 0.1); /* Change background on hover */
+  border: 2px dashed #f4f4f4; /* Dashed border for drag-and-drop */
+  border-radius: 5px;
+}
+
+.game-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ensure the image fits within the container without distortion */
+  transition: transform 1s linear; /* Smooth rotation transition */
+  cursor: pointer; /* Change cursor to indicate drag-and-drop */
+}
+
+form {
+  display: none; /* Hide the form since we are now processing automatically */
+}
+
+/* Carousel Styles */
+.carousel {
+  position: relative;
+  width: 100%;
+  max-width: 650px; /* Match the title image size */
+  margin: 0 auto;
+  overflow: hidden; /* Hide overflow to keep only the visible image within bounds */
+  border-radius: 5px;
+  display: none; /* Hidden initially */
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-images {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-image {
+  min-width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Preserve aspect ratio and fit within container */
+}
+
+.carousel-control {
+  position: absolute;
+  top: 0; /* Cover the entire height */
+  bottom: 0;
+  background-color: black; /* Light background */
+  color: #909090; /* Black color for arrows */
+  border: none;
+  cursor: pointer;
+  z-index: 1000; /* Ensure buttons are above everything else */
+  width: 15%; /* Cover more width for better clickability */
+  height: 100%; /* Cover the entire height of the game-container */
+  pointer-events: auto; /* Ensure the buttons are clickable */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0; /* Hide arrows initially */
+  visibility: hidden; /* Hide arrows initially */
+  transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.3s ease; /* Smooth transition for visibility and hover effect */
+  font-size: 4rem; /* Larger arrow size */
+}
+
+.carousel-control.prev {
+  left: 0;
+  padding-left: 5%; /* Add some padding from the edge of the container */
+}
+
+.carousel-control.next {
+  right: 0;
+  padding-right: 5%; /* Add some padding from the edge of the container */
+}
+
+/* Hover effect for arrows */
+.carousel-control:hover {
+  background-color: black; /* Change background color on hover */
+  color: #f4f4f4; /* Change arrow color on hover */
+}
+
+@media (max-width: 768px) {
+  .image-wrapper,
+  .carousel {
+    max-width: 90%;
+  }
+}

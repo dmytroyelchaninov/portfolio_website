@@ -4,40 +4,47 @@ const pug = require('gulp-pug');
 const browserSync = require('browser-sync').create();
 
 // Task to compile SCSS to CSS
-gulp.task('sass', function() {
-    return gulp.src('src/scss/**/*.scss')
-        .pipe(sass())
+function compileSass(done) {
+    gulp.src('src/scss/**/*.scss')
+        .pipe(sass().on('error', sass.logError))
         .pipe(gulp.dest('static/css'))  // Compile CSS into the static directory
         .pipe(browserSync.stream());
-});
+    done();  // Signal async completion
+}
 
 // Task to compile Pug to HTML for static pages
-gulp.task('pug-static', function() {
-    return gulp.src(['src/pug/**/*.pug', '!src/pug/game.pug'])  // Exclude game.pug
-        .pipe(pug())        
-        .pipe(gulp.dest('static'))  // Compile static HTML into the dist directory
+function compilePug(done) {
+    gulp.src(['src/pug/**/*.pug', '!src/pug/game.pug'])  // Exclude game.pug from the general Pug task
+        .pipe(pug({ pretty: false }))
+        .pipe(gulp.dest('static'))  // Compile static HTML into the static directory
         .pipe(browserSync.stream());
-});
+    done();  // Signal async completion
+}
 
-// Task to compile Pug to HTML for Flask templates
-gulp.task('pug-flask', function() {
-    return gulp.src('src/pug/game.pug')  // Only process game.pug
-        .pipe(pug())
-        .pipe(gulp.dest('darts/templates'))  // Compile into the Flask templates directory
+// Task to compile game.pug separately into darts/templates
+function compileGamePug(done) {
+    gulp.src('src/pug/game.pug')
+        .pipe(pug({ pretty: false }))
+        .pipe(gulp.dest('darts/templates'))  // Compile game.pug into the darts/templates directory
         .pipe(browserSync.stream());
-});
+    done();  // Signal async completion
+}
 
 // Task to initialize BrowserSync and watch for file changes
-gulp.task('serve', function() {
+function serve(done) {
     browserSync.init({
-        server: 'static',  // Serve static files from dist directory
+        server: {
+            baseDir: 'static',  // Serve static files from the static directory
+        },
         port: 3000,
     });
 
-    gulp.watch('src/scss/**/*.scss', gulp.series('sass'));  // Watch for changes in SCSS files
-    gulp.watch('src/pug/**/*.pug', gulp.series('pug-static', 'pug-flask'));  // Watch for changes in Pug files
-    gulp.watch('dist/*.html').on('change', browserSync.reload);  // Reload browser on static HTML changes
-});
+    gulp.watch('src/scss/**/*.scss', compileSass);  // Watch for changes in SCSS files
+    gulp.watch(['src/pug/**/*.pug', '!src/pug/game.pug'], compilePug);  // Watch for changes in non-game Pug files
+    gulp.watch('src/pug/game.pug', compileGamePug);  // Watch for changes in game.pug
+    gulp.watch('static/*.html').on('change', browserSync.reload);  // Reload browser on static HTML changes
+    done();  // Signal async completion
+}
 
 // Default task that runs on 'gulp' command
-gulp.task('default', gulp.series('sass', 'pug-static', 'pug-flask', 'serve'));
+gulp.task('default', gulp.series(compileSass, compilePug, compileGamePug, serve));
