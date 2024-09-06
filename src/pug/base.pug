@@ -9,7 +9,10 @@ html(lang="en")
     each css in css_main || []
       link(rel="stylesheet", href=css)
 
+  - var gameUrl = "../game"
+
   body
+    script.
     .wrapper
       header.header
         .container
@@ -17,17 +20,15 @@ html(lang="en")
             a.header__logo(href="about.html")
               img#logo(src="", alt="Logo")
             .header__burger
-              span
-              span
-              span
-              
+              span.span1
+              span.span2
+              span.span3
             nav.header__menu
               ul.header__list
-                li: a.header__link(href="about.html") About Me
+                li: a.header__link(href="about.html") Me
                 li: a.header__link(href="") Projects
-                li: a.header__link(href="game.html") DARTs!
+                li: a.header__link(href=gameUrl) DARTs!
                 li: a.header__link(href="photo.html") Photography
-                li: a.header__link(href="people.html") Who Am I Proud Of
                 li: a.header__link(href="contact.html") Contact
       .content
         .container
@@ -41,4 +42,3 @@ html(lang="en")
       .footer__body
         .footer__text
           p &copy; 2024 Yelchaninov
-          p Interesting

@@ -2,25 +2,41 @@ extends base.pug
 
 block main_vars
     - var css_main = ["{{ url_for('static', filename='css/style.css') }}", "{{ url_for('static', filename='css/game.css') }}"]
-    - var js_main = ["https://code.jquery.com/jquery-3.4.1.slim.min.js", "{{ url_for('static', filename='js/burger.js') }}", "{{ url_for('static', filename='js/rotate_img.js') }}"]
-    - var logo_src = "{{ url_for('static', filename='images/title.png') }}"
+    - var js_main = ["https://code.jquery.com/jquery-3.4.1.slim.min.js", "{{ url_for('static', filename='js/burger.js') }}", "{{ url_for('static', filename='js/game.js') }}", "{{ url_for('static', filename='js/logo.js') }}"]
+    - var gameUrl = "{{ url_for('game') }}"
 
 block content
-    main.game-container
-        // Image Display and Drag-and-Drop Area
-        #image-wrapper.image-wrapper
-            img#dartboard.game-image(src="{{ url_for('static', filename='images/title.png') }}", alt="Dartboard")
-            form#upload-form(method="post", enctype="multipart/form-data")
-            input#file-input(type="file", name="file", style="display:none;", accept="image/*")
-    
-        // Carousel container (hidden initially)
-        #carousel.carousel(style="display: none;")
-            .carousel-images
-            img#carousel-processed.carousel-image(src="", alt="Processed Image")
-            img#carousel-initial.carousel-image(src="", alt="Initial Image")
-            form#upload-form-carousel(method="post", enctype="multipart/form-data")
-            input#file-input-carousel(type="file", name="file", style="display:none;", accept="image/*")
+    main
+        .explanation
+            .explanation__text
+                h1#game-title Darts!
+                p#game-description Upload an image and see the magic happen!
 
-        // Move the carousel control buttons outside the carousel container
-        button.carousel-control.prev(onclick="prevSlide()") &#10094;
-        button.carousel-control.next(onclick="nextSlide()") &#10095;
+        .game-container
+            .dragdropimg
+                img#dragdropimg(src="{{ url_for('static', filename='images/test_me.jpg') }}", alt="Drag and drop image")
+
+            #image-wrapper.image-wrapper
+                img#dartboard.game-image(src="{{ url_for('static', filename='images/title.png') }}", alt="Dartboard")
+                form#upload-form(method="post", enctype="multipart/form-data")
+                input#file-input(type="file", name="file", style="display:none;", accept="image/*")
+        
+            // Carousel container (hidden initially)
+            #carousel.carousel(style="display: none;")
+                .carousel-images
+                    img#carousel-processed.carousel-image(src="", alt="Processed Image")
+                    img#carousel-initial.carousel-image(src="", alt="Initial Image")
+                    form#upload-form-carousel(method="post", enctype="multipart/form-data")
+                    input#file-input-carousel(type="file", name="file", style="display:none;", accept="image/*")
+
+            .test-button
+                button#test-button(onclick="testImage()") Random Image!
+
+            // Move the carousel control buttons outside the carousel container
+            button.carousel-control.prev(onclick="prevSlide()") &#10094;
+            button.carousel-control.next(onclick="nextSlide()") &#10095;
+
+        .notification-process
+            p Hold on, image is processing
+        .notification-error
+            p Oops, something went wrong

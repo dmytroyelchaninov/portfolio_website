@@ -13,8 +13,8 @@ $font-size-10: 1rem;
 $font-size-075: 0.75rem;
 
 .content__text {
-    font-size: $font-size-25;
-    line-height: 40px;
+    font-size: $font-size-base;
+    line-height: 20px;
 }
 
 @media screen and (max-width: 768px) {
