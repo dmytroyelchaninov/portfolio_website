@@ -1,13 +1,12 @@
-from flask import Flask, render_template, request, jsonify, url_for, redirect
+from flask import Flask, render_template, request, jsonify, url_for
 import os
 import random
 import sys
+from game.image_transform import process_image
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 yolos_dir = os.path.join(script_dir, 'yolos')
 sys.path.append(yolos_dir)
-
-from game.image_transform import process_image, test_run
 
 app = Flask(__name__,
             template_folder='templates',
@@ -18,13 +17,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/game', methods=['GET', 'POST'])
 def game():
-    messages = [
-        "Welcome to the game!",
-        "Try your luck today!",
-        "Good luck, player!",
-        "May the odds be ever in your favor!",
-        "Ready to play?"
-    ]
+
     message = random.choice(messages)
 
     if request.method == 'POST':

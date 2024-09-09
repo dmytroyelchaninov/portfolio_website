@@ -9,14 +9,86 @@
   overflow: hidden;
 }
 
-.dragdropimg {
+.explanation {
+  display: flex;
+}
+
+.explanation__text {
+  position: relative;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#game-title {
+  font-size: 1.5rem;
+  color: #f4f4f4;
+  margin-bottom: 10px;
+}
+
+#game-description {
+  display: none; /* Hide the description by default */
+  transition: max-height 0.3s ease-out;
+  overflow: hidden;
+  font-size: 16px;
+  color: #f4f4f4;
+}
+
+#git-link {
+  color: #FF4545;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.arrow-container {
+  position: relative;
+  width: 100%; /* Make the container take full width of the parent */
+  height: 40px; /* Adjust as needed */
+}
+.arrow-container .arrow {
+  position: absolute;
+  top: 20%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Perfectly centered */
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 15px solid #f4f4f4; /* Adjust the size and color */
+}
+
+.explanation__text .arrow-container {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  font-size: 1.5rem;
+  position: relative;
+}
+
+.explanation__text.expanded #game-description {
+  display: block;
+}
+
+.explanation__text.expanded .arrow-container {
+  transform: rotate(180deg);
+}
+
+.crowns {
   display: flex;
   position: absolute;
-  top: 0;
-  left: 65%;
+  top: 10%;
+  left: 0;
+  width: 40%;
+  height: 40%;
+  object-fit: cover;
+}
+
+.dragdropimg {
+  display: none;
+  position: absolute;
+  top: 10%;
+  left: 5%;
   width: 10%;
   height: 10%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .image-wrapper {
@@ -51,10 +123,20 @@ form {
 }
 
 .test-button {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 65%;
+  height: auto;
+  height: 10%;
+  object-fit: contain;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+  filter: brightness(1.4);
+}
+
+.test-button:hover {
+  filter: brightness(3.2);
 }
 
 .notification-process,
@@ -167,9 +249,15 @@ form {
 }
 
 @media (max-width: 767px) {
+  .crowns {
+    top: 10%;
+  }
   .game-container {
-    padding-top: 70px;
+    padding-top: 90px;
     padding-bottom: 70px;
+  }
+  .test-button {
+    top: 2%;
   }
   .image-wrapper,
   .carousel {
@@ -180,5 +268,16 @@ form {
   }
   .dragdropimg {
     display: none;
+  }
+}
+@media (max-width: 480px) {
+  .game-container {
+    padding-top: 110px;
+  }
+  .test-button {
+    left: 62%;
+    top: 5%;
+    width: 10px;
+    filter: brightness(2);
   }
 }

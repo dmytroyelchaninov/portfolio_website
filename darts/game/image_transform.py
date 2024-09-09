@@ -523,6 +523,7 @@ class BoardTransform(Board):
                     transformed_predictions.append((new_x, new_y))
 
         return transformed_predictions
+
     
     def final_crop_white(self, ellipse, predictions=None, padding=0.03):
 
@@ -580,6 +581,7 @@ class BoardTransform(Board):
                     transformed_predictions.append((new_x, new_y))
 
         return transformed_predictions
+
     def mirror_image(self, axis):
         if axis == 'x':
             mirrored_img = cv.flip(self._img, 0)
@@ -1075,6 +1077,7 @@ class Scores():
         # cv.circle(img, center, self.bulls_eye_inner_radius, c, 2)
         # cv.circle(img, center, self.bulls_eye_outer_radius, c, 2)
         pass
+ 
     def calculate_distance_and_angle(self, prediction):
         distance = np.sqrt((prediction[0] - self._center[0]) ** 2 + (prediction[1] - self._center[1]) ** 2)
         angle = np.degrees(np.arctan2(prediction[1] - self._center[1], prediction[0] - self._center[0]))
@@ -1128,11 +1131,28 @@ class Scores():
         return scores
 
     def draw_distances_and_angles(self, predictions, show=False):
+        # Create a copy of the image to draw on
         img = self.board._img.copy()
+
+        # Create a mask for the transparent region (same size as the image)
+        mask = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)
+
+        # Draw a filled circle at the center with the double_outer_radius as the radius
+        cv.circle(mask, (int(self._center[0]), int(self._center[1])), int(self.double_outer_radius), 255, thickness=-1)
+
+        # Convert the mask to an alpha channel
+        if img.shape[2] == 3:  # If the image is RGB, convert it to RGBA
+            img = cv.cvtColor(img, cv.COLOR_BGR2BGRA)
+
+        # Apply the mask to make the outside of the circle transparent
+        img[:, :, 3] = np.where(mask == 255, 255, 0)
+
+        # Draw the zones on the masked image
         self._draw_zones(img, self._center)
         
         occupied_boxes = []  # List to keep track of bounding boxes of the text
 
+        # Iterate through predictions and scores
         for prediction, score in zip(predictions, self._scores):
             distance, angle = self.calculate_distance_and_angle(prediction)
             
@@ -1149,23 +1169,20 @@ class Scores():
             text_box = (x, y - text_size[1], x + text_size[0], y)
             
             # Adjust position if the text box intersects with any existing box
-            while any(self._check_intersection(text_box, box) for box in occupied_boxes):
-                y += text_size[1] + 5  # Move the text down if it intersects
-                text_box = (x, y - text_size[1], x + text_size[0], y)
-
-            # Draw the text
-            cv.putText(img, text, (x, y), font, font_scale, (56, 40, 215), thickness, cv.LINE_AA)
+            if img.shape[2] == 4:  # BGRA image
+                color = (69, 69, 255, 255)  # Red color with full opacity (B, G, R, A)
+            else:  # BGR image (no alpha)
+                color = (56, 40, 215)  # Red color (B, G, R)
+            
+            # Draw the text with the specified color
+            cv.putText(img, text, (x, y), font, font_scale, color, thickness, cv.LINE_AA)
 
             # Add the bounding box to the list of occupied boxes
             occupied_boxes.append(text_box)
-            
         if show:
             cv.imshow("Distances and Angles", img)
             cv.waitKey(0)
-            cv.waitKey(1)
-            time.sleep(0.1)
             cv.destroyAllWindows()
-            cv.waitKey(1)
 
         return img
 
@@ -1271,7 +1288,7 @@ def predict(board, part1, part2):
         # print(f"padding: {padding}")
     if padding > 50 or padding < 4:
         print("Take picture from another angle")
-        sys.exit(1)
+        raise ValueError("Bad prediction")
 
     return predictions
 
@@ -1305,7 +1322,7 @@ def find_bulls_eye(board, crop_eye=0.25, min_radius=8, max_radius=30, param1=70,
             # print(iter)
             if iter > 8:
                 print("I can't find the center. Please take another image.")
-                sys.exit()
+                raise ValueError("Center not found.")
             dx = radius_step * np.cos(angle)
             dy = radius_step * np.sin(angle)
             new_center = (int(initial_center[0] + dx), int(initial_center[1] + dy))
@@ -1406,7 +1423,7 @@ def find_ellipse(board, eps=10, min_samples=7, threshold=10, plot_ellipse=False,
                 second_try = [first_try[0], min_samples, min(filtered, key=lambda x: x[1])[1], min(filtered, key=lambda x: x[1])[2]]
             else:
                 print("Cant detect board, please take image from another angle")
-                sys.exit()
+                raise ValueError("Board not detected")
 
     if (first_try is not None) and (second_try is not None):
         # print(f"First try: {first_try}, Second try: {second_try}")
@@ -1642,7 +1659,7 @@ def transform(img_path, predictions, eps=10, min_samples=7, threshold=10, crop_s
     
     except Exception as e:
         print(f"Error processing {img_path}: {str(e)}")
-        sys.exit(1)
+        raise ValueError("Error processing image")
 
 
 def process_image(img_path, size=(1000, 1000), accuracy=0.05, iterations=5, show=False, test=False, test_n=None):
@@ -1670,24 +1687,44 @@ def process_image(img_path, size=(1000, 1000), accuracy=0.05, iterations=5, show
     scores.define_zones(show=False)
     scores.get_scores(predictions, shift_angle=shift_angle)
     score = scores._scores
+    # img = scores.draw_distances_and_angles(predictions)
+
+    
+    # processed_image_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+
+    # processed_image = Image.fromarray(processed_image_rgb)
+    # # processed_image = processed_image.convert('RGB')
+    # processed_image_path = img_path.replace('.jpg', '_processed.jpg')
+    # processed_image.save(processed_image_path)
+    # # archive(processed_img, img_path)
+    # print(f"Processed image saved as {processed_image_path}")
+    # return processed_image_path, score
+
     img = scores.draw_distances_and_angles(predictions)
 
-    
-    processed_image_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    # Check if the image has 4 channels (i.e., transparency/alpha channel)
+    if img.shape[2] == 4:  # The image already has an alpha channel (BGRA)
+        # Convert the image to RGBA (from OpenCV format to PIL format)
+        processed_image_rgba = cv.cvtColor(img, cv.COLOR_BGRA2RGBA)
+    else:
+        # If it doesn't have an alpha channel, just convert to RGB
+        processed_image_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
-    processed_image = Image.fromarray(processed_image_rgb)
-    # processed_image = processed_image.convert('RGB')
-    processed_image_path = img_path.replace('.jpg', '_processed.jpg')
-    processed_image.save(processed_image_path)
-    # archive(processed_img, img_path)
+    # Create a PIL image from the processed numpy array
+    processed_image = Image.fromarray(processed_image_rgba if img.shape[2] == 4 else processed_image_rgb)
+
+    # Set the file path for saving the processed image as a PNG
+    processed_image_path = img_path.replace('.jpg', '_processed.png')  # Save as PNG
+
+    # Save the processed image as PNG
+    processed_image.save(processed_image_path, format='PNG')
+
+    # Print the path to the saved image
     print(f"Processed image saved as {processed_image_path}")
+
+    # Return the processed image path and the score
     return processed_image_path, score
 
-def test_run():
-    test_n = input("There are few test images, select the number of picture (1-6): ")
-    processed_image_path, score = process_image(img_path=None, test=True, test_n=test_n)
-    return processed_image_path, score
-    
 
 if __name__ == '__main__':
     pass

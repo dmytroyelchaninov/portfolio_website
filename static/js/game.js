@@ -11,11 +11,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextButton = document.querySelector('.carousel-control.next');
     const notificationProcess = document.querySelector('.notification-process');
     const notificationError = document.querySelector('.notification-error');
+    const arrowContainer = document.querySelector('.arrow-container');
+    const explanationText = document.querySelector('.explanation__text');
+    const randomImages = [ ];
+    for (let i = 1; i<=1; i++) {
+        randomImages.push(`static/test_images/${i}.jpg`);
+    }
 
+    arrowContainer.addEventListener('click', () => {
+        explanationText.classList.toggle('expanded');
+    });
+    
     let rotationInterval;
     let currentRotation = 0;
     const initialImageUrl = dartboard.src;
     let isProcessing = false;
+
+    // startRotation(2000);
 
     imageWrapper.addEventListener('dragover', (event) => {
         event.preventDefault();
@@ -56,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
+            stopRotation();
             resetToInitialImage();
             startRotation();
             uploadImage(fileInput.files[0]);
@@ -84,18 +97,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function startRotation() {
+    function startRotation(time=100) {
         if (!rotationInterval) { // Ensure only one interval is created
             console.log("Starting rotation...");
             rotationInterval = setInterval(() => {
                 currentRotation += 1;
                 dartboard.style.transition = 'transform 0.1s linear'; // Smooth transition
                 dartboard.style.transform = `rotate(${currentRotation}deg)`;
-            }, 100); // Rotate every 100 milliseconds
+            }, time); // Rotate every 100 milliseconds
         }
     }
 
     function stopRotation() {
+        // console.log(`rotationInterval: ${rotationInterval}`); // Debugging log
+        // console.log(`currentRotation: ${currentRotation}`); // Debugging log
         if (rotationInterval) {
             console.log("Stopping rotation..."); // Debugging log
             clearInterval(rotationInterval);
@@ -126,14 +141,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function showImageWrapper() {
         imageWrapper.style.display = 'flex';
     }
-
     function showArrows() {
         prevButton.style.opacity = '1';
         prevButton.style.visibility = 'visible';
         nextButton.style.opacity = '1';
         nextButton.style.visibility = 'visible';
     }
-
     function hideArrows() {
         prevButton.style.opacity = '0';
         prevButton.style.visibility = 'hidden';
@@ -143,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function uploadImage(file) {
         isProcessing = true;
+
         const formData = new FormData();
         formData.append('file', file);
     
@@ -184,7 +198,6 @@ document.addEventListener('DOMContentLoaded', function () {
             isProcessing = false;
         };
     
-    
         xhr.send(formData);
     }
 
@@ -205,11 +218,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const offset = -currentSlide * 100;  // Calculate the offset
         document.querySelector('.carousel-images').style.transform = `translateX(${offset}%)`;
     }
-    
     window.prevSlide = function () {
         showSlide(currentSlide - 1);
     };
-    
     window.nextSlide = function () {
         showSlide(currentSlide + 1);
     };
@@ -221,12 +232,10 @@ document.addEventListener('DOMContentLoaded', function () {
         startX = event.touches[0].clientX;
         isSwiping = true;
     });
-
     carousel.addEventListener('touchmove', (event) => {
         if (!isSwiping) return;
         currentX = event.touches[0].clientX;
     });
-
     carousel.addEventListener('touchend', () => {
         const swipeDistance = startX - currentX;
         
@@ -240,4 +249,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
         isSwiping = false;
     });
+
+    // Function to simulate a random image being "dropped"
+    function testImage() {
+        // if (rotationInterval) {
+        //     console.log("Stopping rotation..."); // Debugging log
+        //     clearInterval(rotationInterval);
+        //     rotationInterval = null; // Clear the interval reference
+        // }
+        // dartboard.style.transform = `rotate(${currentRotation}deg)`; // Keep the current rotation
+
+        if (isProcessing) {
+            console.log("Image processing is in progress. Please wait.");
+            notificationProcess.style.display = 'flex';
+            setTimeout(() => {
+                notificationProcess.style.display = 'none';
+            }, 3000);
+            return;
+        }
+    
+        // Select a random image from the array
+        const randomIndex = Math.floor(Math.random() * randomImages.length);
+        const selectedImage = randomImages[randomIndex];
+    
+        // Simulate file input change and trigger the upload process
+        fetch(selectedImage)
+            .then(response => response.blob())
+            .then(blob => {
+                const file = new File([blob], `testImage.jpg`, { type: blob.type });
+                resetToInitialImage(); // Reset image before uploading (keep this)
+                setTimeout(() => {      // Add a slight delay before starting rotation
+                    resetCarousel();
+                    resetToInitialImage();
+                    startRotation();
+                    uploadImage(file);
+                }, 0);
+            })
+            .catch(err => {
+                console.error('An error occurred while fetching the test image:', err);
+                notificationError.classList.add('show');
+                setTimeout(() => {
+                    notificationError.classList.remove('show');
+                }, 3000);
+            });
+    }
+    window.testImage = testImage;
 });

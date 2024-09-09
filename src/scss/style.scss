@@ -103,6 +103,7 @@ body.fade-out {
     animation: dropDown 0.3s ease-out 0s;
     opacity: 0;
     animation-fill-mode: forwards;
+    left: 2%;
     img {
         max-width: 100%;
         display: block;
